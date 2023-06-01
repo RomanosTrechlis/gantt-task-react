@@ -30,8 +30,6 @@ export const addToDate = (
   quantity: number,
   scale: DateHelperScales
 ) => {
-  console.log(quantity)
-  console.log(`Year: ${date.getFullYear()}, Month: ${date.getMonth()}, Date: ${date.getDate()}, Hours: ${date.getHours()}`)
   const newDate = new Date(
     date.getFullYear() + (scale === "year" ? quantity : 0),
     date.getMonth() + (scale === "month" ? quantity : 0),
@@ -110,7 +108,7 @@ export const ganttDateRange = (
       if (!postStepsCount) {
         newEndDate = startOfDate(newEndDate, "year");
       }
-      newEndDate = addToDate(newEndDate, postStepsCount! || 12, "month");
+      newEndDate = addToDate(newEndDate, postStepsCountCalculation(1, 12, postStepsCount), "month");
       break;
     case ViewMode.Week:
       newStartDate = startOfDate(newStartDate, "day");
@@ -126,7 +124,7 @@ export const ganttDateRange = (
       if (!postStepsCount) {
         newEndDate = startOfDate(newEndDate, "day");
       }
-      newEndDate = addToDate(newEndDate, postStepsCount! || 19, "day");
+      newEndDate = addToDate(newEndDate, postStepsCountCalculation(1, 19, postStepsCount), "day");
       break;
     case ViewMode.QuarterDay:
       newStartDate = startOfDate(newStartDate, "day");
@@ -134,7 +132,7 @@ export const ganttDateRange = (
       if (!postStepsCount) {
         newEndDate = startOfDate(newEndDate, "day");
       }
-      newEndDate = addToDate(newEndDate, postStepsCount! || 66, "hour"); // 24(1 day)*3 - 6
+      newEndDate = addToDate(newEndDate, postStepsCountCalculation(6, 66, postStepsCount), "hour"); // 24(1 day)*3 - 6
       break;
     case ViewMode.HalfDay:
       newStartDate = startOfDate(newStartDate, "day");
@@ -142,7 +140,7 @@ export const ganttDateRange = (
       if (!postStepsCount) {
         newEndDate = startOfDate(newEndDate, "day");
       }
-      newEndDate = addToDate(newEndDate, postStepsCount! || 108, "hour"); // 24(1 day)*5 - 12
+      newEndDate = addToDate(newEndDate, postStepsCountCalculation(12, 108), "hour"); // 24(1 day)*5 - 12
       break;
     case ViewMode.Hour:
       newStartDate = startOfDate(newStartDate, "hour");
@@ -150,11 +148,18 @@ export const ganttDateRange = (
       if (!postStepsCount) {
         newEndDate = startOfDate(newEndDate, "day");
       }
-      newEndDate = addToDate(newEndDate, postStepsCount! || 24, "hour");
+      newEndDate = addToDate(newEndDate, postStepsCountCalculation(1, 24, postStepsCount), "hour");
       break;
   }
   return [newStartDate, newEndDate];
 };
+
+const postStepsCountCalculation = (fix: number, def: number, postStepsCount?: number): number => {
+  if (!!postStepsCount) {
+    return postStepsCount - fix > 0 ? postStepsCount - fix : postStepsCount
+  }
+  return def
+}
 
 export const seedDates = (
   startDate: Date,
